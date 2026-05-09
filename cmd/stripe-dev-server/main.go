@@ -89,16 +89,20 @@ func runDefault(args []string) int {
 			return 1
 		}
 		// Run stripe-mock in HTTP-only mode so it doesn't open a second
-		// listener on the default HTTPS port 12112, which would collide
-		// with the proxy port. -http enables HTTP-only mode; -http-port
-		// specifies the port (mutually exclusive with -http-addr per
-		// stripe-mock).
-		mockPort, mockHostErr := portFromAddr(*stripeMockAddr)
-		if mockHostErr != nil {
-			fmt.Fprintln(os.Stderr, "invalid --stripe-mock address:", mockHostErr)
-			return 1
+		// listener on the default HTTPS port 12112 (which collides with
+		// the proxy). The bare -http flag is mutually exclusive with
+		// -http-addr/-http-port/-http-unix per stripe-mock and binds to
+		// the default :12111. So we constrain the spawned mock to the
+		// default port and document --stripe-mock as advisory only when
+		// not spawning.
+		mockProc = exec.Command(bin, "-http")
+		// Inform the user if their --stripe-mock value won't be honored
+		// because we're using stripe-mock's default port 12111.
+		if *stripeMockAddr != "127.0.0.1:12111" && *stripeMockAddr != ":12111" {
+			fmt.Fprintf(os.Stderr,
+				"warning: --stripe-mock=%s is overridden by stripe-mock's default :12111 in HTTP-only mode\n",
+				*stripeMockAddr)
 		}
-		mockProc = exec.Command(bin, "-http", "-http-port", mockPort)
 		mockProc.Stdout = os.Stdout
 		mockProc.Stderr = os.Stderr
 		if err := mockProc.Start(); err != nil {
