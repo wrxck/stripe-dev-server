@@ -1,0 +1,85 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --accent: #635bff;
+  --good: #3fb950;
+  --bad: #f85149;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg); color: var(--text); height: 100%;
+}
+header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 20px; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 600; }
+nav { display: flex; gap: 4px; margin-left: 24px; }
+.tab, .actions button {
+  background: transparent; border: 1px solid transparent;
+  color: var(--text); padding: 6px 12px; border-radius: 6px;
+  cursor: pointer; font: inherit;
+}
+.tab:hover, .actions button:hover { background: #1f242c; }
+.tab.active { border-color: var(--accent); color: var(--accent); }
+.actions { margin-left: auto; display: flex; gap: 8px; }
+
+main { height: calc(100vh - 56px); }
+.view { display: none; height: 100%; }
+.view.active { display: block; }
+
+#captures-view {
+  display: none;
+  grid-template-columns: 1fr 2fr;
+  gap: 1px;
+  background: var(--border);
+  height: 100%;
+}
+#captures-view.active { display: grid; }
+
+#captures-list { background: var(--bg); overflow-y: auto; }
+#captures-detail { background: var(--bg); padding: 24px; overflow-y: auto; }
+
+.row { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.row:hover { background: var(--panel); }
+.row.selected { background: #1f242c; border-left: 3px solid var(--accent); padding-left: 13px; }
+.row .top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.row .method { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 600; color: var(--accent); }
+.row .status { font-size: 12px; color: var(--muted); }
+.row .status.s2 { color: var(--good); }
+.row .status.s4, .row .status.s5 { color: var(--bad); }
+.row .path { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; color: var(--text); margin-top: 2px; }
+.row .ts { color: var(--muted); font-size: 11px; }
+
+#captures-detail h2 { margin: 0 0 8px; font-size: 18px; word-break: break-all; }
+#captures-detail .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+#captures-detail h3 { margin-top: 24px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+#captures-detail pre {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px 16px; white-space: pre-wrap; word-break: break-word; overflow-x: auto;
+}
+
+#webhook-form { padding: 24px; max-width: 720px; margin: 0 auto; }
+#webhook-form h2 { margin-top: 0; }
+#webhook-form label { display: block; margin: 16px 0 4px; }
+#webhook-form input, #webhook-form select, #webhook-form textarea {
+  width: 100%; padding: 8px 10px; border-radius: 6px;
+  background: var(--panel); border: 1px solid var(--border);
+  color: var(--text); font: inherit;
+}
+#webhook-form textarea { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+#webhook-form button[type=submit] {
+  margin-top: 16px; padding: 8px 16px; border-radius: 6px;
+  background: var(--accent); border: 0; color: white; cursor: pointer; font: inherit;
+}
+#webhook-result { margin-top: 16px; }
+
+.muted { color: var(--muted); }
+.empty { padding: 60px 20px; text-align: center; color: var(--muted); }

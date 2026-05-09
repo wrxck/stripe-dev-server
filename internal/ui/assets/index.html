@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>stripe-dev-server</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">stripe-dev-server</div>
+    <nav>
+      <button class="tab active" data-tab="captures">Captures</button>
+      <button class="tab" data-tab="webhooks">Webhooks</button>
+    </nav>
+    <div class="actions">
+      <button id="refresh">Refresh</button>
+      <button id="clear">Clear</button>
+    </div>
+  </header>
+  <main>
+    <section id="captures-view" class="view active">
+      <div id="captures-list"></div>
+      <aside id="captures-detail"><p class="muted">Select a capture to inspect.</p></aside>
+    </section>
+    <section id="webhooks-view" class="view">
+      <form id="webhook-form">
+        <h2>Trigger a webhook</h2>
+        <label>Event type
+          <select name="eventType">
+            <option>payment_intent.succeeded</option>
+            <option>payment_intent.payment_failed</option>
+            <option>payment_intent.created</option>
+            <option>charge.succeeded</option>
+            <option>charge.refunded</option>
+            <option>customer.created</option>
+            <option>customer.updated</option>
+            <option>customer.subscription.created</option>
+            <option>customer.subscription.updated</option>
+            <option>customer.subscription.deleted</option>
+            <option>invoice.payment_succeeded</option>
+            <option>invoice.payment_failed</option>
+            <option>checkout.session.completed</option>
+          </select>
+        </label>
+        <label>Target URL
+          <input type="url" name="targetUrl" placeholder="http://localhost:3000/api/webhooks/stripe" required>
+        </label>
+        <label>Object payload (JSON for <code>data.object</code>)
+          <textarea name="dataObject" rows="8">{
+  "id": "pi_test_123",
+  "amount": 1000,
+  "currency": "usd"
+}</textarea>
+        </label>
+        <button type="submit">Trigger</button>
+        <pre id="webhook-result" class="muted"></pre>
+      </form>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
