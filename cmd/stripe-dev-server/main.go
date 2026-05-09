@@ -87,7 +87,10 @@ func runDefault(args []string) int {
 			fmt.Fprintln(os.Stderr, "Detail:", err)
 			return 1
 		}
-		mockProc = exec.Command(bin, "-http-addr", *stripeMockAddr)
+		// Disable stripe-mock's HTTPS listener (-https-port -1) so we can
+		// freely choose any port for the proxy without colliding with
+		// stripe-mock's default HTTPS port 12112.
+		mockProc = exec.Command(bin, "-http-addr", *stripeMockAddr, "-https-port", "-1")
 		mockProc.Stdout = os.Stdout
 		mockProc.Stderr = os.Stderr
 		if err := mockProc.Start(); err != nil {
