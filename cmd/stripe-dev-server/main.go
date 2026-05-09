@@ -87,10 +87,13 @@ func runDefault(args []string) int {
 			fmt.Fprintln(os.Stderr, "Detail:", err)
 			return 1
 		}
-		// Disable stripe-mock's HTTPS listener (-https-port -1) so we can
-		// freely choose any port for the proxy without colliding with
-		// stripe-mock's default HTTPS port 12112.
-		mockProc = exec.Command(bin, "-http-addr", *stripeMockAddr, "-https-port", "-1")
+		// Run stripe-mock in HTTP-only mode (-http) so it doesn't open a
+		// second listener on the default HTTPS port 12112, which would
+		// collide with the proxy port. The -https-port flag's default
+		// value of -1 doesn't actually disable the HTTPS listener — it
+		// just means "use the default port 12112". The -http flag is the
+		// switch that suppresses the HTTPS listener entirely.
+		mockProc = exec.Command(bin, "-http", "-http-addr", *stripeMockAddr)
 		mockProc.Stdout = os.Stdout
 		mockProc.Stderr = os.Stderr
 		if err := mockProc.Start(); err != nil {
