@@ -16,6 +16,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -87,13 +88,17 @@ func runDefault(args []string) int {
 			fmt.Fprintln(os.Stderr, "Detail:", err)
 			return 1
 		}
-		// Run stripe-mock in HTTP-only mode (-http) so it doesn't open a
-		// second listener on the default HTTPS port 12112, which would
-		// collide with the proxy port. The -https-port flag's default
-		// value of -1 doesn't actually disable the HTTPS listener — it
-		// just means "use the default port 12112". The -http flag is the
-		// switch that suppresses the HTTPS listener entirely.
-		mockProc = exec.Command(bin, "-http", "-http-addr", *stripeMockAddr)
+		// Run stripe-mock in HTTP-only mode so it doesn't open a second
+		// listener on the default HTTPS port 12112, which would collide
+		// with the proxy port. -http enables HTTP-only mode; -http-port
+		// specifies the port (mutually exclusive with -http-addr per
+		// stripe-mock).
+		mockPort, mockHostErr := portFromAddr(*stripeMockAddr)
+		if mockHostErr != nil {
+			fmt.Fprintln(os.Stderr, "invalid --stripe-mock address:", mockHostErr)
+			return 1
+		}
+		mockProc = exec.Command(bin, "-http", "-http-port", mockPort)
 		mockProc.Stdout = os.Stdout
 		mockProc.Stderr = os.Stderr
 		if err := mockProc.Start(); err != nil {
@@ -309,6 +314,15 @@ func waitForListener(url string, timeout time.Duration) error {
 		time.Sleep(100 * time.Millisecond)
 	}
 	return fmt.Errorf("timed out after %s", timeout)
+}
+
+// portFromAddr extracts the port portion of a "host:port" address.
+func portFromAddr(addr string) (string, error) {
+	_, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return "", err
+	}
+	return port, nil
 }
 
 // guard against unused-import drift
